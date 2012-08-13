@@ -440,7 +440,7 @@ class IRI
 
         while (strlen($input) > 0) {
             if (('../' === substr($input, 0, 3)) || ('./' === substr($input, 0, 2))) {
-                $input = substr($input, strpos($input,'/'));
+                $input = substr($input, strpos($input, '/'));
             } elseif($input == '/.') {
                 $input = '/';
             } elseif ('/./' === substr($input, 0, 3)) {

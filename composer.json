@@ -1,7 +1,7 @@
 {
     "name": "ml/iri",
     "type": "library",
-    "description": "IRI handling",
+    "description": "IRI handling for PHP",
     "keywords": [ "IRI", "URL", "URI", "URN" ],
     "homepage": "http://www.markus-lanthaler.com",
     "license": "MIT",
