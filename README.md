@@ -16,7 +16,7 @@ The easiest way to use IRI is to integrate it as a dependency in your project's
 
     {
         "require": {
-            "ml/iri": "*"
+            "ml/iri": "@dev"
         }
     }
 
