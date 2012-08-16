@@ -73,7 +73,7 @@ class IRI
     /**
      * Constructor
      *
-     * @param string $iri The IRI.
+     * @param null|string $iri The IRI.
      *
      * @throws \InvalidArgumentException If an invalid IRI is passed.
      *
