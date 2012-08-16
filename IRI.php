@@ -79,9 +79,11 @@ class IRI
      *
      * @api
      */
-    public function __construct($iri)
+    public function __construct($iri = null)
     {
-        $this->parse($iri);
+        if (null !== $iri) {
+            $this->parse($iri);
+        }
     }
 
     /**
