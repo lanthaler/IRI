@@ -94,10 +94,10 @@ class IRI
             $this->query = $iri->query;
             $this->fragment = $iri->fragment;
         } else {
-            throw new \InvalidArgumentException(sprintf(
-                'Expecting a string or an IRI, got %s',
+            throw new \InvalidArgumentException(
+                'Expecting a string or an IRI, got ' .
                 (is_object($iri) ? get_class($iri) : gettype($iri))
-            ));
+            );
         }
     }
 
@@ -222,7 +222,7 @@ class IRI
     }
 
     /**
-     * @see http://tools.ietf.org/html/rfc3986#section-5.2
+     * Resolve a (relative) reference against this IRI.
      *
      * @param IRI|string $reference The (relative) reference that should be
      *                              resolved against this IRI.
@@ -232,6 +232,8 @@ class IRI
      * @throws \InvalidArgumentException If an invalid IRI is passed.
      *
      * @api
+     *
+     * @see http://tools.ietf.org/html/rfc3986#section-5.2
      */
     public function resolve($reference)
     {
@@ -440,13 +442,13 @@ class IRI
             } elseif ('/.' === $input) {
                 $input = '/';
             } elseif (('/../' === substr($input, 0, 4)) || ('/..' === $input)) {
-                if($input == '/..') {
+                if ($input == '/..') {
                     $input = '/';
                 } else {
                     $input = substr($input, 3);
                 }
 
-                if(false !== ($end = strrpos($output, '/'))) {
+                if (false !== ($end = strrpos($output, '/'))) {
                     $output = substr($output, 0, $end);
                 } else {
                     $output = '';
@@ -454,7 +456,7 @@ class IRI
             } elseif (('..' === $input) || ('.' === $input)) {
                 $input = '';
             } else {
-                if(false === ($end = strpos($input, '/', 1))) {
+                if (false === ($end = strpos($input, '/', 1))) {
                     $output .= $input;
                     $input = '';
                 } else {
@@ -466,3 +468,4 @@ class IRI
         return $output;
     }
 }
+
