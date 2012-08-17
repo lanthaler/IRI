@@ -73,7 +73,7 @@ class IRI
     /**
      * Constructor
      *
-     * @param null|string $iri The IRI.
+     * @param null|string|IRI $iri The IRI.
      *
      * @throws \InvalidArgumentException If an invalid IRI is passed.
      *
@@ -81,8 +81,23 @@ class IRI
      */
     public function __construct($iri = null)
     {
-        if (null !== $iri) {
+        if (null === $iri) {
+            return;
+        } elseif (is_string($iri)) {
             $this->parse($iri);
+        } elseif ($iri instanceof IRI) {
+            $this->scheme = $iri->scheme;
+            $this->userinfo = $iri->userinfo;
+            $this->host = $iri->host;
+            $this->port = $iri->port;
+            $this->path = $iri->path;
+            $this->query = $iri->query;
+            $this->fragment = $iri->fragment;
+        } else {
+            throw new \InvalidArgumentException(sprintf(
+                'Expecting a string or an IRI, got %s',
+                (is_object($iri) ? get_class($iri) : gettype($iri))
+            ));
         }
     }
 
@@ -103,20 +118,20 @@ class IRI
      */
     public function getAuthority()
     {
-        if ($this->host) {
-            $authority = '//';
-            if ($this->userinfo) {
+        $authority = null;
+
+        if (null !== $this->host) {
+
+            if (null !== $this->userinfo) {
                 $authority .= $this->userinfo . '@';
             }
             $authority .= $this->host;
-            if ($this->port) {
+            if (null !== $this->port) {
                 $authority .= ':' . $this->port;
             }
-
-            return $authority;
         }
 
-        return null;
+        return $authority;
     }
 
     /**
@@ -220,14 +235,7 @@ class IRI
      */
     public function resolve($reference)
     {
-        if (is_string($reference)) {
-            $reference = new IRI($reference);
-        } elseif (false === ($reference instanceof IRI)) {
-            throw new \InvalidArgumentException(sprintf(
-                'Expecting a string or IRI, got %s',
-                (is_object($reference) ? get_class($reference) : gettype($reference))
-            ));
-        }
+        $reference = new IRI($reference);
 
         $scheme = null;
         $authority = null;
@@ -243,14 +251,14 @@ class IRI
             $path = self::removeDotSegments($reference->path);
             $query = $reference->query;
         } else {
-            if ($reference->getAuthority()) {
+            if (null !== $reference->getAuthority()) {
                 $authority = $reference->getAuthority();
                 $path = self::removeDotSegments($reference->path);
                 $query = $reference->query;
             } else {
                 if (0 === strlen($reference->path)) {
                     $path = $this->path;
-                    if ($reference->query) {
+                    if (null !== $reference->query) {
                         $query = $reference->query;
                     } else {
                         $query = $this->query;
@@ -260,7 +268,7 @@ class IRI
                         $path = self::removeDotSegments($reference->path);
                     } else {
                         // T.path = merge(Base.path, R.path);
-                        if ($this->getAuthority() && ('' === $this->path)) {
+                        if ((null !== $this->getAuthority()) && ('' === $this->path)) {
                             $path = '/' . $reference->path;
                         } else {
                             if (false !== ($end = strrpos($this->path, '/'))) {
@@ -289,17 +297,17 @@ class IRI
             $result = $scheme . ':';
         }
 
-        if ($authority) {
+        if (null !== $authority) {
             $result .= '//' . $authority;
         }
 
         $result .= $path;
 
-        if ($query) {
+        if (null !== $query) {
             $result .= '?' . $query;
         }
 
-        if ($fragment) {
+        if (null !== $fragment) {
             $result .= '#' . $fragment;
         }
 
@@ -321,24 +329,17 @@ class IRI
             $result .= $this->scheme . ':';
         }
 
-        if ($this->host) {
-            $result .= '//';
-            if ($this->userinfo) {
-                $result .= $this->userinfo . '@';
-            }
-            $result .= $this->host;
-            if ($this->port) {
-                $result .= ':' . $this->port;
-            }
+        if (null !== ($authority = $this->getAuthority())) {
+            $result .= '//' . $authority;
         }
 
         $result .= $this->path;
 
-        if ($this->query) {
+        if (null !== $this->query) {
             $result .= '?' . $this->query;
         }
 
-        if ($this->fragment) {
+        if (null !== $this->fragment) {
             $result .= '#' . $this->fragment;
         }
 
@@ -354,24 +355,16 @@ class IRI
      * @param string $iri The IRI to parse.
      *
      * @return IRI The parsed IRI.
-     *
-     * @throws \InvalidArgumentException If an invalid IRI is passed.
      */
     protected function parse($iri)
     {
-        if (false === is_string($iri)) {
-            throw new \InvalidArgumentException(sprintf(
-                'Expecting a string, got %s',
-                (is_object($iri) ? get_class($iri) : gettype($iri))
-            ));
-        }
-
         // Parse IRI by using the regular expression as specified by
         // http://tools.ietf.org/html/rfc3986#appendix-B
         // The scheme part was modified to only return valid schemes
+        // TODO Check if this is desired or if this should be move to a validation method
         $regex = '|^((?P<scheme>[A-Za-z][A-Za-z0-9\.\+\-]*):)?' .
-                    '(//(?P<authority>[^/?#]*))?(?P<path>[^?#]*)' .
-                    '(\?(?P<query>[^#]*))?(#(?P<fragment>.*))?|';
+                    '((?P<doubleslash>//)(?P<authority>[^/?#]*))?(?P<path>[^?#]*)' .
+                    '((?<querydef>\?)(?P<query>[^#]*))?(#(?P<fragment>.*))?|';
         preg_match($regex, $iri, $match);
 
         // Extract scheme
@@ -380,32 +373,31 @@ class IRI
         }
 
         // Parse authority (http://tools.ietf.org/html/rfc3986#section-3.2)
-        if (false === empty($match['authority'])) {
-            $authority = $match['authority'];
+        if ('//' === $match['doubleslash']) {
+            if (0 === strlen($match['authority'])) {
+                $this->host = '';
+            } else {
+                $authority = $match['authority'];
 
-            // Split authority into userinfo and host
-            // (use last @ to ignore unescaped @ symbols)
-            if (false !== ($pos = strrpos($authority, '@'))) {
-                $this->userinfo = substr($authority, 0, $pos);
-                $authority = substr($authority, $pos + 1);
-            }
-
-            // Split authority into host and port
-            $hostEnd = 0;
-            if (('[' === $authority[0]) && (false !== ($pos = strpos($authority, ']')))) {
-                $hostEnd = $pos;
-            }
-
-            if ((false !== ($pos = strrpos($authority, ':'))) && ($pos > $hostEnd)) {
-                $this->host = substr($authority, 0, $pos);
-                $authority = substr($authority, $pos + 1);
-
-                if (false === empty($authority)) {
-                    $this->port = $authority;
+                // Split authority into userinfo and host
+                // (use last @ to ignore unescaped @ symbols)
+                if (false !== ($pos = strrpos($authority, '@'))) {
+                    $this->userinfo = substr($authority, 0, $pos);
+                    $authority = substr($authority, $pos + 1);
                 }
-            } else
-            {
-                $this->host = $authority;
+
+                // Split authority into host and port
+                $hostEnd = 0;
+                if (('[' === $authority[0]) && (false !== ($pos = strpos($authority, ']')))) {
+                    $hostEnd = $pos;
+                }
+
+                if ((false !== ($pos = strrpos($authority, ':'))) && ($pos > $hostEnd)) {
+                    $this->host = substr($authority, 0, $pos);
+                    $this->port = substr($authority, $pos + 1);
+                } else {
+                    $this->host = $authority;
+                }
             }
         }
 
@@ -414,12 +406,12 @@ class IRI
         $this->path = $match['path'];
 
         // Extract query (http://tools.ietf.org/html/rfc3986#section-3.4)
-        if (false === empty($match['query'])) {
+        if (false === empty($match['querydef'])) {
             $this->query = $match['query'];
         }
 
         // Extract fragment (http://tools.ietf.org/html/rfc3986#section-3.5)
-        if (false === empty($match['fragment'])) {
+        if (isset($match['fragment'])) {
             $this->fragment = $match['fragment'];
         }
     }
@@ -443,8 +435,6 @@ class IRI
         while (strlen($input) > 0) {
             if (('../' === substr($input, 0, 3)) || ('./' === substr($input, 0, 2))) {
                 $input = substr($input, strpos($input, '/'));
-            } elseif($input == '/.') {
-                $input = '/';
             } elseif ('/./' === substr($input, 0, 3)) {
                 $input = substr($input, 2);
             } elseif ('/.' === $input) {
