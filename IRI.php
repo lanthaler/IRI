@@ -362,9 +362,7 @@ class IRI
     {
         // Parse IRI by using the regular expression as specified by
         // http://tools.ietf.org/html/rfc3986#appendix-B
-        // The scheme part was modified to only return valid schemes
-        // TODO Check if this is desired or if this should be move to a validation method
-        $regex = '|^((?P<scheme>[A-Za-z][A-Za-z0-9\.\+\-]*):)?' .
+        $regex = '|^((?P<scheme>[^:/?#]+):)?' .
                     '((?P<doubleslash>//)(?P<authority>[^/?#]*))?(?P<path>[^?#]*)' .
                     '((?<querydef>\?)(?P<query>[^#]*))?(#(?P<fragment>.*))?|';
         preg_match($regex, $iri, $match);
