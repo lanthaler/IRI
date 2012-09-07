@@ -1,5 +1,7 @@
 <?php
 
+// @codingStandardsIgnoreFile
+
 spl_autoload_register(function($class)
 {
     if (0 === strpos($class, 'ML\\IRI\\')) {

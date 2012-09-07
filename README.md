@@ -2,10 +2,12 @@ IRI
 ==============
 
 This is a simple PHP class to ease IRI handling. Currently it just supports
-parsing and relative IRI resolution. In the future I will extend it to support
-validation and normalization.
+parsing of IRIs and relative IRI resolution. In the future I will extend it
+to support validation and normalization and perhaps also support for IRI
+templates.
 
-The class is extensively unit tested: Tests: [![Build Status](https://secure.travis-ci.org/lanthaler/IRI.png?branch=master)](http://travis-ci.org/lanthaler/IRI)
+With more than 700 tests, this class is extensively unit tested:
+[![Build Status](https://secure.travis-ci.org/lanthaler/IRI.png?branch=master)](http://travis-ci.org/lanthaler/IRI)
 
 
 Installation
@@ -14,11 +16,13 @@ Installation
 The easiest way to use IRI is to integrate it as a dependency in your project's
 [composer.json](http://getcomposer.org/doc/00-intro.md) file:
 
-    {
-        "require": {
-            "ml/iri": "@dev"
-        }
+```json
+{
+    "require": {
+        "ml/iri": "1.*"
     }
+}
+```
 
 Installing is then a matter of running composer
 
@@ -26,10 +30,12 @@ Installing is then a matter of running composer
 
 ... and including Composer's autoloader to your project
 
-    require('vendor/autoload.php');
+```php
+require('vendor/autoload.php');
+```
 
 
-Of course you can also download an [archive](https://github.com/lanthaler/IRI/downloads)
+Of course you can also just download an [archive](https://github.com/lanthaler/IRI/downloads)
 from Github.
 
 

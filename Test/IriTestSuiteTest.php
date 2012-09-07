@@ -36,7 +36,9 @@ class JsonLDTestSuiteTest extends \PHPUnit_Framework_TestCase
      */
     public function testDecomposition($iri, $scheme, $userinfo, $host, $port, $path, $query, $fragment)
     {
-        $test = new IRI($iri);
+        $iri = new IRI($iri);
+        $test = new IRI($iri);  // test copy-constructor
+
         $this->assertEquals($scheme, $test->getScheme(), 'Scheme of ' . $iri);
         $this->assertEquals($userinfo, $test->getUserInfo(), 'User info of ' . $iri);
         $this->assertEquals($host, $test->getHost(), 'Host of ' . $iri);
@@ -75,6 +77,16 @@ class JsonLDTestSuiteTest extends \PHPUnit_Framework_TestCase
             array('http://user:pass@example.org:99?aaa/bbb', 'http', 'user:pass', 'example.org', '99', '', 'aaa/bbb', null),
             array('http://user:pass@example.org:99#aaa/bbb', 'http', 'user:pass', 'example.org', '99' , '', null, 'aaa/bbb')
         );
+    }
+
+    /**
+     * Test whether parsing invalid values leads to an exception.
+     *
+     * @expectedException InvalidArgumentException
+     */
+    public function testParseInvalidValue()
+    {
+        $iri = new IRI(2);
     }
 
     /**
