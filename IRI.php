@@ -353,8 +353,6 @@ class IRI
      * {@link http://tools.ietf.org/html/rfc3986#section-3.1 RFC3986}.
      *
      * @param string $iri The IRI to parse.
-     *
-     * @return IRI The parsed IRI.
      */
     protected function parse($iri)
     {
