@@ -16,7 +16,7 @@ use ML\IRI\IRI;
  *
  * @author Markus Lanthaler <mail@markus-lanthaler.com>
  */
-class JsonLDTestSuiteTest extends \PHPUnit_Framework_TestCase
+class IriTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * Test parsing
