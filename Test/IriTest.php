@@ -51,7 +51,7 @@ class IriTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Decomposition test cases.
+     * Decomposition test cases
      *
      * These test cases were taken from the
      * {@link http://tools.ietf.org/html/rfc3986#section-1.1.2 URI specification}
@@ -80,7 +80,7 @@ class IriTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Test whether parsing invalid values leads to an exception.
+     * Test whether parsing invalid values leads to an exception
      *
      * @expectedException InvalidArgumentException
      */
@@ -90,7 +90,7 @@ class IriTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Test whether an IRI is an absolute IRI or a relative one.
+     * Test whether an IRI is an absolute IRI or a relative one
      *
      * @param string $iri        The IRI to test.
      * @param bool   $isAbsolute True if the IRI is absolute, false otherwise.
@@ -105,7 +105,7 @@ class IriTest extends \PHPUnit_Framework_TestCase
 
 
     /**
-     * Absolute/relative IRI test cases.
+     * Absolute/relative IRI test cases
      *
      * These tests were taken from the
      * {@link http://tools.ietf.org/html/rfc3986#section-5.4 URI specification} and from
@@ -198,7 +198,7 @@ class IriTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Test relative reference resolution.
+     * Test relative reference resolution
      *
      * @param string $base      The base IRI.
      * @param string $reference The reference to resolve.
@@ -206,14 +206,14 @@ class IriTest extends \PHPUnit_Framework_TestCase
      *
      * @dataProvider referenceResolutionProvider
      */
-    public function testReferenceResolution($base, $reference, $absolute)
+    public function testReferenceResolution($base, $reference, $expected)
     {
         $base = new IRI($base);
-        $this->assertEquals($absolute, (string)$base->resolve($reference));
+        $this->assertEquals($expected, (string)$base->resolve($reference));
     }
 
     /**
-     * Reference resolution test cases.
+     * Reference resolution test cases
      *
      * These test cases were taken from the
      * {@link http://tools.ietf.org/html/rfc3986#section-5.4 URI specification},

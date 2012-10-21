@@ -9,61 +9,59 @@
 
 namespace ML\IRI;
 
-//use ML\JsonLD\Exception\ParseException;
-
 /**
  * IRI represents an IRI as per RFC3987.
  *
  * @author Markus Lanthaler <mail@markus-lanthaler.com>
  *
- * @see http://tools.ietf.org/html/rfc3987 RFC3987
+ * @link http://tools.ietf.org/html/rfc3987 RFC3987
  */
 class IRI
 {
     /**
-     * The scheme.
+     * The scheme
      *
      * @var string|null
      */
     private $scheme = null;
 
     /**
-     * The user information.
+     * The user information
      *
      * @var string|null
      */
     private $userinfo = null;
 
     /**
-     * The host.
+     * The host
      *
      * @var string|null
      */
     private $host = null;
 
     /**
-     * The port.
+     * The port
      *
      * @var string|null
      */
     private $port = null;
 
     /**
-     * The path.
+     * The path
      *
      * @var string
      */
     private $path = '';
 
     /**
-     * The query component.
+     * The query component
      *
      * @var string|null
      */
     private $query = null;
 
     /**
-     * The fragment identifier.
+     * The fragment identifier
      *
      * @var string|null
      */
@@ -102,7 +100,7 @@ class IRI
     }
 
     /**
-     * Get the scheme.
+     * Get the scheme
      *
      * @return string|null Returns the scheme or null if not set.
      */
@@ -112,7 +110,7 @@ class IRI
     }
 
     /**
-     * Get the authority.
+     * Get the authority
      *
      * @return string|null Returns the authority or null if not set.
      */
@@ -135,7 +133,7 @@ class IRI
     }
 
     /**
-     * Get the user information.
+     * Get the user information
      *
      * @return string|null Returns the user information or null if not set.
      */
@@ -145,7 +143,7 @@ class IRI
     }
 
     /**
-     * Get the host.
+     * Get the host
      *
      * @return string|null Returns the host or null if not set.
      */
@@ -155,7 +153,7 @@ class IRI
     }
 
     /**
-     * Get the port.
+     * Get the port
      *
      * @return string|null Returns the port or null if not set.
      */
@@ -165,7 +163,7 @@ class IRI
     }
 
     /**
-     * Get the path.
+     * Get the path
      *
      * @return string Returns the path which might be empty.
      */
@@ -175,7 +173,7 @@ class IRI
     }
 
     /**
-     * Get the query component.
+     * Get the query component
      *
      * @return string|null Returns the query component or null if not set.
      */
@@ -185,7 +183,7 @@ class IRI
     }
 
     /**
-     * Get the fragment identifier.
+     * Get the fragment identifier
      *
      * @return string|null Returns the fragment identifier or null if not set.
      */
@@ -195,7 +193,7 @@ class IRI
     }
 
     /**
-     * Find out whether the IRI is absolute.
+     * Find out whether the IRI is absolute
      *
      * @return bool Returns true if the IRI is absolute, false otherwise.
      *
@@ -207,7 +205,7 @@ class IRI
     }
 
     /**
-     * Check whether the passed IRI is equal.
+     * Check whether the passed IRI is equal
      *
      * @param IRI|string $iri IRI to compare to this instance.
      *
@@ -222,7 +220,7 @@ class IRI
     }
 
     /**
-     * Resolve a (relative) reference against this IRI.
+     * Resolve a (relative) reference against this IRI
      *
      * @param IRI|string $reference The (relative) reference that should be
      *                              resolved against this IRI.
@@ -231,9 +229,9 @@ class IRI
      *
      * @throws \InvalidArgumentException If an invalid IRI is passed.
      *
-     * @api
+     * @link http://tools.ietf.org/html/rfc3986#section-5.2
      *
-     * @see http://tools.ietf.org/html/rfc3986#section-5.2
+     * @api
      */
     public function resolve($reference)
     {
@@ -317,9 +315,9 @@ class IRI
     }
 
     /**
-     * Returns the string representation of the IRI object.
+     * Get a string representation of this IRI object
      *
-     * @return A string representation of this IRI instance.
+     * @return string A string representation of this IRI instance.
      *
      * @api
      */
@@ -349,7 +347,7 @@ class IRI
     }
 
     /**
-     * Parse an IRI into it's components.
+     * Parse an IRI into it's components
      *
      * This is done according to
      * {@link http://tools.ietf.org/html/rfc3986#section-3.1 RFC3986}.
@@ -422,11 +420,11 @@ class IRI
      * This method removes the special "." and ".." complete path segments
      * from an IRI.
      *
-     * @see http://tools.ietf.org/html/rfc3986#section-5.2.4
-     *
      * @param string $input The IRI from which dot segments should be removed.
      *
      * @return string The IRI with all dot-segments removed.
+     *
+     * @link http://tools.ietf.org/html/rfc3986#section-5.2.4
      */
     private static function removeDotSegments($input)
     {
