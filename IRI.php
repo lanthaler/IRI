@@ -319,6 +319,9 @@ class IRI
      *
      * @param IRI|string $base The (relative) IRI reference that should be
      *                         be used as base IRI.
+     * @param bool             Defines whether schema-relative IRIs such
+     *                         as `//example.com` should be created (`true`)
+     *                         or not (`false`).
      *
      * @return IRI The IRI reference relative to the passed base IRI.
      *
@@ -326,7 +329,7 @@ class IRI
      *
      * @api
      */
-    public function relativeTo($base)
+    public function relativeTo($base, $schemaRelative = false)
     {
         if (false === ($base instanceof IRI)) {
             $base = new IRI($base);
@@ -337,12 +340,16 @@ class IRI
         if ($relative->scheme !== $base->scheme) {
             return $relative;
         }
-        $relative->scheme = null;
 
         // Compare authority
         if ($relative->getAuthority() !== $base->getAuthority()) {
+            if (true === $schemaRelative) {
+                $relative->scheme = null;
+            }
+
             return $relative;
         }
+        $relative->scheme = null;
         $relative->host = null;
         $relative->userinfo = null;
         $relative->port = null;
@@ -402,6 +409,9 @@ class IRI
      * the IRIs to convert to relative IRI references change.
      *
      * @param  string|IRI $iri The IRI to convert to a relative reference
+     * @param bool             Defines whether schema-relative IRIs such
+     *                         as `//example.com` should be created (`true`)
+     *                         or not (`false`).
      *
      * @throws \InvalidArgumentException If an invalid IRI is passed.
      *
@@ -409,12 +419,12 @@ class IRI
      *
      * @return IRI      The relative IRI reference
      */
-    public function baseFor($iri) {
+    public function baseFor($iri, $schemaRelative = false) {
         if (false === ($iri instanceof IRI)) {
             $iri = new IRI($iri);
         }
 
-        return $iri->relativeTo($this);
+        return $iri->relativeTo($this, $schemaRelative);
     }
 
     /**

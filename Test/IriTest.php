@@ -893,20 +893,21 @@ class IriTest extends \PHPUnit_Framework_TestCase
     /**
      * Test conversion to relative IRI reference
      *
-     * @param string $iri       The reference IRI to convert to a relative
-     *                          reference.
-     * @param string $base      The base IRI.
-     * @param string $expected  The expected IRI reference.
+     * @param string $iri            The reference IRI to convert to a
+     *                               relative reference.
+     * @param string $base           The base IRI.
+     * @param bool   $schemaRelative Should schema-relative IRIs be created?
+     * @param string $expected       The expected IRI reference.
      *
      * @dataProvider relativizeProvider
      */
-    public function testRelativize($iri, $base, $expected)
+    public function testRelativize($iri, $base, $schemaRelative, $expected)
     {
         $iri = new IRI($iri);
-        $this->assertEquals($expected, (string)$iri->relativeTo($base));
+        $this->assertEquals($expected, (string)$iri->relativeTo($base, $schemaRelative));
 
         $base = new IRI($base);
-        $this->assertEquals($expected, (string)$base->baseFor((string)$iri));
+        $this->assertEquals($expected, (string)$base->baseFor((string)$iri, $schemaRelative));
     }
 
     /**
@@ -919,61 +920,64 @@ class IriTest extends \PHPUnit_Framework_TestCase
      */
     public function relativizeProvider()
     {
-        return array(  // $iri, $base, $expected
-            array('http://ex/x/y/z', 'http://ex/x/y/z', 'z'),
-            array('https://example.com/x/y/z', 'http://example.com/x/y/z', 'https://example.com/x/y/z'),
-            array('http://example.com/x/y/z/', 'http://example.com/x/y/z/', './'),
-            array('http://example.com/x/y/z/?query', 'http://example.com/x/y/z/', '?query'),
-            array('http://example.com/x/y/z/#fragment', 'http://example.com/x/y/z/', '#fragment'),
-            array('http://example.com/x/y/z', 'http://example.com/x/y/z', 'z'),
-            array('http://example.com/x/y/z?query', 'http://example.com/x/y/z', '?query'),
-            array('http://example.com/x/y/z#fragment', 'http://example.com/x/y/z', '#fragment'),
-            array('http://example.com/x/y/z:a', 'http://example.com/x/y/', './z:a'),
-            array('http://example.com/x/y/z', 'http://example.com/x/y', 'y/z'),
-            array('http://example.com/x/y/z', 'http://example.com/a/b/c', '../../x/y/z'),
-            array('http://example.com/x/y/z?query', 'http://example.com/a/b/c', '../../x/y/z?query'),
-            array('http://example.com/x/y/z#fragment', 'http://example.com/a/b/c', '../../x/y/z#fragment'),
-            array('http://example.com/x/y/z?query#fragment', 'http://example.com/a/b/c', '../../x/y/z?query#fragment'),
-            array('http://example.org/x/y/z', 'http://example.com/a/b/c', '//example.org/x/y/z'),
-            array('http://example/x/abc', 'http://example/x/y/z', '../abc'),
-            array('file:/ex/x/q/r#s', 'file:/ex/x/y', 'q/r#s'),
-            array('http://ex/x/y', null, 'http://ex/x/y'),
-            array('http://example.com/a', 'http://example.com/a/', '../a'),
-            array('http://example.com/a', 'http://example.com/a/b', '../a'),
-            array('http://example.com/a/b/c?query', 'http://example.com/a/b/c?query', '?query'),
-            // array('http://ex/r', 'http://ex/x/y/z', '/r')    // root-relative if no path is shared
-            array('http://ex/r', 'http://ex/x/y/z', '../../r'),
+        return array(  // $iri, $base, $schemaRelative, $expected
+            array('http://ex/x/y/z', 'http://ex/x/y/z', false, 'z'),
+            array('https://example.com/x/y/z', 'http://example.com/x/y/z', false, 'https://example.com/x/y/z'),
+            array('http://example.com/x/y/z/', 'http://example.com/x/y/z/', false, './'),
+            array('http://example.com/x/y/z/?query', 'http://example.com/x/y/z/', false, '?query'),
+            array('http://example.com/x/y/z/#fragment', 'http://example.com/x/y/z/', false, '#fragment'),
+            array('http://example.com/x/y/z', 'http://example.com/x/y/z', false, 'z'),
+            array('http://example.com/x/y/z?query', 'http://example.com/x/y/z', false, '?query'),
+            array('http://example.com/x/y/z#fragment', 'http://example.com/x/y/z', false, '#fragment'),
+            array('http://example.com/x/y/z:a', 'http://example.com/x/y/', false, './z:a'),
+            array('http://example.com/x/y/z', 'http://example.com/x/y', false, 'y/z'),
+            array('http://example.com/x/y/z', 'http://example.com/a/b/c', false, '../../x/y/z'),
+            array('http://example.com/x/y/z?query', 'http://example.com/a/b/c', false, '../../x/y/z?query'),
+            array('http://example.com/x/y/z#fragment', 'http://example.com/a/b/c', false, '../../x/y/z#fragment'),
+            array('http://example.com/x/y/z?query#fragment', 'http://example.com/a/b/c', false, '../../x/y/z?query#fragment'),
+            array('http://example.org/x/y/z', 'http://example.com/a/b/c', false, 'http://example.org/x/y/z'),
+            array('http://example.org/x/y/z', 'http://example.com/a/b/c', true, '//example.org/x/y/z'),
+            array('http://example/x/abc', 'http://example/x/y/z', false, '../abc'),
+            array('file:/ex/x/q/r#s', 'file:/ex/x/y', false, 'q/r#s'),
+            array('http://ex/x/y', null, false, 'http://ex/x/y'),
+            array('http://example.com/a', 'http://example.com/a/', false, '../a'),
+            array('http://example.com/a', 'http://example.com/a/b', false, '../a'),
+            array('http://example.com/a/b/c?query', 'http://example.com/a/b/c?query', false, '?query'),
+            array('http://ex/r', 'http://ex/x/y/z', false, '../../r'),
             // http://dig.csail.mit.edu/2005/ajar/ajaw/test/uri-test-doc.html
-            array('bar:abc', 'foo:xyz', 'bar:abc'),
-            array('http://example/x/abc', 'http://example/x/y/z', '../abc'),
-            array('http://example/x/abc', 'http://example2/x/y/z', '//example/x/abc'),
-            array('http://ex/x/r', 'http://ex/x/y/z', '../r'),
-            array('http://ex/x/q/r', 'http://ex/x/y', 'q/r'),
-            array('http://ex/x/q/r#s', 'http://ex/x/y', 'q/r#s'),
-            array('http://ex/x/q/r#s/t', 'http://ex/x/y', 'q/r#s/t'),
-            array('ftp://ex/x/q/r', 'http://ex/x/y', 'ftp://ex/x/q/r'),
-            array('http://ex/x/y/z/', 'http://ex/x/y', 'y/z/'),
-            array('file:/swap/test/animal.rdf#Animal', 'file:/swap/test/animal.rdf', '#Animal'),
-            array('file:/e/x/abc', 'file:/e/x/y/z', '../abc'),
-            array('file:/example/x/abc', 'file:/example2/x/y/z', '../../../example/x/abc'),
-            array('file:/ex/x/r', 'file:/ex/x/y/z', '../r'),
-            array('file:/r', 'file:/ex/x/y/z', '../../../r'),
-            array('file:/ex/x/q/r', 'file:/ex/x/y/z', '../q/r'),
-            array('file:/ex/x/q/r#s', 'file:/ex/x/y', 'q/r#s'),
-            array('file:/ex/x/q/r#', 'file:/ex/x/y', 'q/r#'),
-            array('file:/ex/x/q/r#s/t', 'file:/ex/x/y', 'q/r#s/t'),
-            array('ftp://ex/x/q/r', 'file:/ex/x/y', 'ftp://ex/x/q/r'),
-            array('file:/ex/x/y/z/', 'file:/ex/x/y/', 'z/'),
-            array('file://meetings.example.com/cal#m1', 'file:/devel/WWW/2000/10/swap/test/reluri-1.n3', '//meetings.example.com/cal#m1'),
-            array('file://meetings.example.com/cal#m1', 'file:/home/connolly/w3ccvs/WWW/2000/10/swap/test/reluri-1.n3', '//meetings.example.com/cal#m1'),
-            array('file:/some/dir/#blort', 'file:/some/dir/foo', './#blort'),
-            array('file:/some/dir/#', 'file:/some/dir/foo', './#'),
-            array('http://example/x/abc', 'http://example/x/y%2Fz', 'abc'),
-            array('http://example/x%2Fabc', 'http://example/x/y/z', '../../x%2Fabc'),
-            array('http://example/x%2Fabc', 'http://example/x/y%2Fz', '../x%2Fabc'),
-            array('http://example/x%2Fy/abc', 'http://example/x%2Fy/z', 'abc'),
-            array('http://example/x/', 'http://example/x/abc.efg', './'),   // ???
-            array('http://www.w3.org/2002/01/tr-automation/tr.rdf', 'http://www.w3.org/People/Berners-Lee/card.rdf', '../../2002/01/tr-automation/tr.rdf'),
+            array('bar:abc', 'foo:xyz', false, 'bar:abc'),
+            array('http://example/x/abc', 'http://example/x/y/z', false, '../abc'),
+            array('http://example/x/abc', 'http://example2/x/y/z', false, 'http://example/x/abc'),
+            array('http://example/x/abc', 'http://example2/x/y/z', true, '//example/x/abc'),
+            array('http://ex/x/r', 'http://ex/x/y/z', false, '../r'),
+            array('http://ex/x/q/r', 'http://ex/x/y', false, 'q/r'),
+            array('http://ex/x/q/r#s', 'http://ex/x/y', false, 'q/r#s'),
+            array('http://ex/x/q/r#s/t', 'http://ex/x/y', false, 'q/r#s/t'),
+            array('ftp://ex/x/q/r', 'http://ex/x/y', false, 'ftp://ex/x/q/r'),
+            array('http://ex/x/y/z/', 'http://ex/x/y', false, 'y/z/'),
+            array('file:/swap/test/animal.rdf#Animal', 'file:/swap/test/animal.rdf', false, '#Animal'),
+            array('file:/e/x/abc', 'file:/e/x/y/z', false, '../abc'),
+            array('file:/example/x/abc', 'file:/example2/x/y/z', false, '../../../example/x/abc'),
+            array('file:/ex/x/r', 'file:/ex/x/y/z', false, '../r'),
+            array('file:/r', 'file:/ex/x/y/z', false, '../../../r'),
+            array('file:/ex/x/q/r', 'file:/ex/x/y/z', false, '../q/r'),
+            array('file:/ex/x/q/r#s', 'file:/ex/x/y', false, 'q/r#s'),
+            array('file:/ex/x/q/r#', 'file:/ex/x/y', false, 'q/r#'),
+            array('file:/ex/x/q/r#s/t', 'file:/ex/x/y', false, 'q/r#s/t'),
+            array('ftp://ex/x/q/r', 'file:/ex/x/y', false, 'ftp://ex/x/q/r'),
+            array('file:/ex/x/y/z/', 'file:/ex/x/y/', false, 'z/'),
+            array('file://meetings.example.com/cal#m1', 'file:/devel/WWW/2000/10/swap/test/reluri-1.n3', false, 'file://meetings.example.com/cal#m1'),
+            array('file://meetings.example.com/cal#m1', 'file:/devel/WWW/2000/10/swap/test/reluri-1.n3', true, '//meetings.example.com/cal#m1'),
+            array('file://meetings.example.com/cal#m1', 'file:/home/connolly/w3ccvs/WWW/2000/10/swap/test/reluri-1.n3', false, 'file://meetings.example.com/cal#m1'),
+            array('file://meetings.example.com/cal#m1', 'file:/home/connolly/w3ccvs/WWW/2000/10/swap/test/reluri-1.n3', true, '//meetings.example.com/cal#m1'),
+            array('file:/some/dir/#blort', 'file:/some/dir/foo', false, './#blort'),
+            array('file:/some/dir/#', 'file:/some/dir/foo', false, './#'),
+            array('http://example/x/abc', 'http://example/x/y%2Fz', false, 'abc'),
+            array('http://example/x%2Fabc', 'http://example/x/y/z', false, '../../x%2Fabc'),
+            array('http://example/x%2Fabc', 'http://example/x/y%2Fz', false, '../x%2Fabc'),
+            array('http://example/x%2Fy/abc', 'http://example/x%2Fy/z', false, 'abc'),
+            array('http://example/x/', 'http://example/x/abc.efg', false, './'),   // ???
+            array('http://www.w3.org/2002/01/tr-automation/tr.rdf', 'http://www.w3.org/People/Berners-Lee/card.rdf', false, '../../2002/01/tr-automation/tr.rdf'),
         );
     }
 }
