@@ -220,10 +220,10 @@ class IRI
     }
 
     /**
-     * Resolve a (relative) reference against this IRI
+     * Resolve a (relative) IRI reference against this IRI
      *
-     * @param IRI|string $reference The (relative) reference that should be
-     *                              resolved against this IRI.
+     * @param IRI|string $reference The (relative) IRI reference that should
+     *                              be resolved against this IRI.
      *
      * @return IRI The resolved IRI.
      *
@@ -312,6 +312,109 @@ class IRI
         }
 
         return new IRI($result);
+    }
+
+    /**
+     * Transform this IRI to a IRI reference relative to the passed base IRI
+     *
+     * @param IRI|string $base The (relative) IRI reference that should be
+     *                         be used as base IRI.
+     *
+     * @return IRI The IRI reference relative to the passed base IRI.
+     *
+     * @throws \InvalidArgumentException If an invalid IRI is passed.
+     *
+     * @api
+     */
+    public function relativeTo($base)
+    {
+        if (false === ($base instanceof IRI)) {
+            $base = new IRI($base);
+        }
+        $relative = clone $this;
+
+        // Compare scheme
+        if ($relative->scheme !== $base->scheme) {
+            return $relative;
+        }
+        $relative->scheme = null;
+
+        // Compare authority
+        if ($relative->getAuthority() !== $base->getAuthority()) {
+            return $relative;
+        }
+        $relative->host = null;
+        $relative->userinfo = null;
+        $relative->port = null;
+
+        // Compare path
+        $baseSegments     = explode('/', $base->path);
+        $relativeSegments = explode('/', $relative->path);
+        $len = min(count($baseSegments), count($relativeSegments)) - 1;  // do not move beyond last segment
+
+        $pos = 0;
+
+        while (($baseSegments[$pos] === $relativeSegments[$pos]) && ($pos < $len)) {
+            $pos++;
+        }
+
+        $relative->path = '';
+        $numBaseSegments = count($baseSegments) - $pos - 1;
+        if ($numBaseSegments > 0) {
+            $relative->path .= str_repeat('../', $numBaseSegments);
+        }
+
+        if (($baseSegments[$pos] !== $relativeSegments[$pos]) ||
+            ((null === $relative->query) && (null === $relative->fragment))) {
+            // if the two paths differ or if there's neither a query component nor a fragment,
+            // we need to consider this IRI's path
+
+            if (($relative->path === '') && (false !== strpos($relativeSegments[$pos], ':'))) {
+                // if the first path segment contains a colon, we need to
+                // prepend a ./ to distinguish it from an absolute IRI
+                $relative->path .= './';
+            }
+
+            $relative->path .= implode('/', array_slice($relativeSegments, $pos));
+
+            // .. and ensure that the resulting path isn't empty
+            if (($relative->path === '')) {
+                $relative->path .= './';
+            }
+        }
+
+        if ($relative->query !== $base->query) {
+            return $relative;
+        }
+
+        if (null !== $relative->fragment) {
+            $relative->query = null;
+        }
+
+        return $relative;
+    }
+
+    /**
+     * Convert an IRI to a relative IRI reference using this IRI as base
+     *
+     * This method provides a more convenient interface than the
+     * {@link IRI::relativeTo()} method if the base IRI stays the same while
+     * the IRIs to convert to relative IRI references change.
+     *
+     * @param  string|IRI $iri The IRI to convert to a relative reference
+     *
+     * @throws \InvalidArgumentException If an invalid IRI is passed.
+     *
+     * @see \ML\IRI\IRI::relativeTo()
+     *
+     * @return IRI      The relative IRI reference
+     */
+    public function baseFor($iri) {
+        if (false === ($iri instanceof IRI)) {
+            $iri = new IRI($iri);
+        }
+
+        return $iri->relativeTo($this);
     }
 
     /**
