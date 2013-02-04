@@ -205,6 +205,29 @@ class IRI
     }
 
     /**
+     * Get as absolute IRI, i.e., without fragment identifier
+     *
+     * @return IRI The absolute IRI, i.e., without fragment identifier
+     *
+     * @throws \UnexpectedValueException If the IRI is a relative IRI.
+     *
+     * @link http://tools.ietf.org/html/rfc3987#section-2.2 RFC3987 absolute-IRI
+     *
+     * @api
+     */
+    public function getAbsoluteIri()
+    {
+        if (false === $this->isAbsolute()) {
+            throw new \UnexpectedValueException('Cannot get the absolute IRI of a relative IRI.');
+        }
+
+        $absolute  = clone $this;
+        $absolute->fragment = null;
+
+        return $absolute;
+    }
+
+    /**
      * Check whether the passed IRI is equal
      *
      * @param IRI|string $iri IRI to compare to this instance.
@@ -419,7 +442,8 @@ class IRI
      *
      * @return IRI      The relative IRI reference
      */
-    public function baseFor($iri, $schemaRelative = false) {
+    public function baseFor($iri, $schemaRelative = false)
+    {
         if (false === ($iri instanceof IRI)) {
             $iri = new IRI($iri);
         }
@@ -575,4 +599,3 @@ class IRI
         return $output;
     }
 }
-

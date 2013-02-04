@@ -198,6 +198,29 @@ class IriTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Test conversion to absolute IRI, i.e., removal of the fragment
+     */
+    public function testGetAbsoluteIri()
+    {
+        $iri = new IRI('http://example.org/aaa%2fbbb#ccc');
+        $this->assertEquals('http://example.org/aaa%2fbbb', (string) $iri->getAbsoluteIri());
+
+        $iri = new IRI('http://example.org/iri#with-fragment/looking/like/a/path?and&query');
+        $this->assertEquals('http://example.org/iri', (string) $iri->getAbsoluteIri());
+    }
+
+    /**
+     * Test conversion to absolute IRI for a relative IRI
+     *
+     * @expectedException UnexpectedValueException
+     */
+    public function testGetAbsoluteIriOnRelativeIri()
+    {
+        $iri = new IRI('/relative#with-fragment');
+        $iri->getAbsoluteIri();
+    }
+
+    /**
      * Test relative reference resolution
      *
      * @param string $base      The base IRI.
@@ -981,4 +1004,3 @@ class IriTest extends \PHPUnit_Framework_TestCase
         );
     }
 }
-
