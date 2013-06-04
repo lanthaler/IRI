@@ -75,7 +75,8 @@ class IriTest extends \PHPUnit_Framework_TestCase
             array('http://user:pass@example.org:99/aaa/bbb?qqq#fff', 'http', 'user:pass', 'example.org', '99', '/aaa/bbb' , 'qqq', 'fff'),
             // INVALID IRI array('http://user:pass@example.org:99aaa/bbb'),
             array('http://user:pass@example.org:99?aaa/bbb', 'http', 'user:pass', 'example.org', '99', '', 'aaa/bbb', null),
-            array('http://user:pass@example.org:99#aaa/bbb', 'http', 'user:pass', 'example.org', '99' , '', null, 'aaa/bbb')
+            array('http://user:pass@example.org:99#aaa/bbb', 'http', 'user:pass', 'example.org', '99' , '', null, 'aaa/bbb'),
+            array('http://example.com?query', 'http', null, 'example.com', null, '', 'query', null)
         );
     }
 
@@ -1001,6 +1002,77 @@ class IriTest extends \PHPUnit_Framework_TestCase
             array('http://example/x%2Fy/abc', 'http://example/x%2Fy/z', false, 'abc'),
             array('http://example/x/', 'http://example/x/abc.efg', false, './'),   // ???
             array('http://www.w3.org/2002/01/tr-automation/tr.rdf', 'http://www.w3.org/People/Berners-Lee/card.rdf', false, '../../2002/01/tr-automation/tr.rdf'),
+        );
+    }
+
+    /**
+     * Invalid IRI test cases
+     *
+     * These test cases were taken from
+     * {@link http://www.ninebynine.org/Software/HaskellUtils/Network/URITestDescriptions.html}.
+     *
+     * @return array The invalid IRI test cases.
+     */
+    public function invalidIriProvider()
+    {
+        return array(
+            array('[2010:836B:4179::836B:4179]'),
+            array('http://foo.org:80Path/More'),
+            array('::'),
+            array(' '),  // is this an invalid IRI??
+            array('%'),
+            array('A%Z'),
+            array('%ZZ'),
+            array('%AZ'),
+            array('A C'),
+            array('A\C"'),
+            array('A`C'),
+            array('A<C'),
+            array('A>C'),
+            array('A^C'),
+            array('A\\C'),
+            array('A{C'),
+            array('A|C'),
+            array('A}C'),
+            array('A[C'),
+            array('A]C'),
+            array('A[**]C'),
+            array('http://[xyz]/'),
+            array('http://]/'),
+            array('http://example.org/[2010:836B:4179::836B:4179]'),
+            array('http://example.org/abc#[2010:836B:4179::836B:4179]'),
+            array('http://example.org/xxx/[qwerty]#a[b]'),
+            array('http://example.org/xxx/qwerty#a#b'),
+            array('http://user:pass@example.org:99aaa/bbb')
+        );
+    }
+
+    /**
+     * Normalization test cases
+     *
+     * These test cases were taken from
+     * {@link http://www.ninebynine.org/Software/HaskellUtils/Network/URITestDescriptions.html}.
+     *
+     * @return array The normalization test cases.
+     */
+    public function normalizationProvider()
+    {
+        return array(
+            // Case normalization; cf. RFC3986 section 6.2.2.1 (NOTE: authority case normalization is not performed)
+            array('HTTP://EXAMPLE.com/Root/%2a?%2b#%2c', 'http://EXAMPLE.com/Root/%2A?%2B#%2C'),
+            // Encoding normalization; cf. RFC3986 section 6.2.2.2
+            array('HTTP://EXAMPLE.com/Root/%7eMe/', 'HTTP://EXAMPLE.com/Root/~Me/'),
+            array('foo:%40%41%5a%5b%60%61%7a%7b%2f%30%39%3a%2d%2e%5f%7e', 'foo:%40AZ%5b%60az%7b%2f09%3a-._~'),
+            array('foo:%3a%2f%3f%23%5b%5d%40', 'foo:%3a%2f%3f%23%5b%5d%40'),
+            // Path segment normalization; cf. RFC3986 section 6.2.2.3
+            array('http://example/a/b/../../c', 'http://example/c'),
+            array('http://example/a/b/c/../../', 'http://example/a/'),
+            array('http://example/a/b/c/./', 'http://example/a/b/c/'),
+            array('http://example/a/b/c/.././', 'http://example/a/b/'),
+            array('http://example/a/b/c/d/../../../../e', 'http://example/e'),
+            array('http://example/a/b/c/d/../.././../../e', 'http://example/e'),
+            array('http://example/a/b/../.././../../e', 'http://example/e'),
+            array('foo:a/b/../.././../../e', 'foo:e')
         );
     }
 }
