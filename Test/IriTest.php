@@ -87,7 +87,7 @@ class IriTest extends \PHPUnit_Framework_TestCase
      */
     public function testParseInvalidValue()
     {
-        $iri = new IRI(2);
+        new IRI(2);
     }
 
     /**
