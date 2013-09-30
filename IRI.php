@@ -497,7 +497,7 @@ class IRI
         // http://tools.ietf.org/html/rfc3986#appendix-B
         $regex = '|^((?P<scheme>[^:/?#]+):)?' .
                     '((?P<doubleslash>//)(?P<authority>[^/?#]*))?(?P<path>[^?#]*)' .
-                    '((?<querydef>\?)(?P<query>[^#]*))?(#(?P<fragment>.*))?|';
+                    '((?P<querydef>\?)(?P<query>[^#]*))?(#(?P<fragment>.*))?|';
         preg_match($regex, $iri, $match);
 
         // Extract scheme
