@@ -301,8 +301,8 @@ class IriTest extends \PHPUnit_Framework_TestCase
             array('http://a/b/c/d;p?q', 'http:g', 'http:g'),
             // http://www.w3.org/2004/04/uri-rel-test.html
             array('http://a/b/c/d;p?q', './g:h', 'http://a/b/c/g:h'),
-            // http://dig.csail.mit.edu/2005/ajar/ajaw/test/uri-test-doc.html},
-            // http://www.ninebynine.org/Software/HaskellUtils/Network/URITestDescriptions.html}.
+            // http://dig.csail.mit.edu/2005/ajar/ajaw/test/uri-test-doc.html
+            // http://www.ninebynine.org/Software/HaskellUtils/Network/URITestDescriptions.html
             array('foo:xyz', 'bar:abc', 'bar:abc'),
             array('http://example/x/y/z', '../abc', 'http://example/x/abc'),
             array('http://example2/x/y/z', '//example/x/abc', 'http://example/x/abc'),
@@ -348,7 +348,6 @@ class IriTest extends \PHPUnit_Framework_TestCase
             array('foo:a/b?c#d', '', 'foo:a/b?c'),
             array('foo:a', 'b/c', 'foo:b/c'),
             array('foo:/a/y/z', '../b/c', 'foo:/a/b/c'),
-            // TODO Check this test, shouldn't the result be foo:/b/c? array('foo:a', './b/c', 'foo:b/c'),
             array('foo:a', '/./b/c', 'foo:/b/c'),
             array('foo://a//b/c', '../../d', 'foo://a/d'),
             array('foo:a', '.', 'foo:'),
