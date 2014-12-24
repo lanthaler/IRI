@@ -395,9 +395,10 @@ class IRI
         }
 
         if (($baseSegments[$pos] !== $relativeSegments[$pos]) ||
-            ((null === $relative->query) && (null === $relative->fragment))) {
-            // if the two paths differ or if there's neither a query component nor a fragment,
-            // we need to consider this IRI's path
+            ((null === $relative->query) && (null === $relative->fragment)) ||
+            $base->path === '') {
+            // if the two paths differ or if there's neither a query component nor a fragment
+            // or there is no base path, we need to consider this IRI's path
 
             if (($relative->path === '') && (false !== strpos($relativeSegments[$pos], ':'))) {
                 // if the first path segment contains a colon, we need to

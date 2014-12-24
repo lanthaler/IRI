@@ -944,6 +944,7 @@ class IriTest extends \PHPUnit_Framework_TestCase
     public function relativizeProvider()
     {
         return array(  // $iri, $base, $schemaRelative, $expected
+            array('http://example.com/x/y?k=v', 'http://example.com', false, '/x/y?k=v'),
             array('http://ex/x/y/z', 'http://ex/x/y/z', false, 'z'),
             array('https://example.com/x/y/z', 'http://example.com/x/y/z', false, 'https://example.com/x/y/z'),
             array('http://example.com/x/y/z/', 'http://example.com/x/y/z/', false, './'),
