@@ -396,7 +396,7 @@ class IRI
 
         if (($baseSegments[$pos] !== $relativeSegments[$pos]) ||
             ((null === $relative->query) && (null === $relative->fragment)) ||
-            $base->path === '') {
+            ($base->path === '')) {
             // if the two paths differ or if there's neither a query component nor a fragment
             // or there is no base path, we need to consider this IRI's path
 
