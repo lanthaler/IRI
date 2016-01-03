@@ -8,6 +8,7 @@ templates.
 
 With more than 700 tests, this class is extensively unit tested:
 [![Build Status](https://secure.travis-ci.org/lanthaler/IRI.png?branch=master)](http://travis-ci.org/lanthaler/IRI)
+[![Code Coverage](https://scrutinizer-ci.com/g/lanthaler/IRI/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/lanthaler/IRI/?branch=master)
 
 
 Installation
