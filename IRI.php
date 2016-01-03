@@ -522,7 +522,9 @@ class IRI
 
                 // Split authority into host and port
                 $hostEnd = 0;
-                if (('[' === $authority[0]) && (false !== ($pos = strpos($authority, ']')))) {
+                if ((strlen($authority) > 0) &&
+                    ('[' === $authority[0]) &&
+                    (false !== ($pos = strpos($authority, ']')))) {
                     $hostEnd = $pos;
                 }
 
