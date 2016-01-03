@@ -16,7 +16,7 @@ namespace ML\IRI;
  *
  * @link http://tools.ietf.org/html/rfc3987 RFC3987
  */
-class IRI
+class IRI implements \Psr\Http\Message\UriInterface
 {
     /**
      * The scheme
@@ -450,6 +450,166 @@ class IRI
         }
 
         return $iri->relativeTo($this, $schemaRelative);
+    }
+
+    /**
+     * Return an instance with the specified scheme.
+     *
+     * An empty scheme is equivalent to removing the scheme.
+     *
+     * @param string $scheme The scheme to use with the new instance.
+     *
+     * @return self A new instance with the specified scheme.
+     *
+     * @throws \InvalidArgumentException for invalid or unsupported schemes.
+     */
+    public function withScheme($scheme)
+    {
+        // TODO Validate input
+        // TODO Implementations MUST support the schemes "http" and "https" case insensitively
+        $result = new IRI($this);
+        $result->scheme = $scheme;
+
+        return $result;
+    }
+
+    /**
+     * Return an instance with the specified user information.
+     *
+     * Password is optional, but the user information MUST include the
+     * user; an empty string for the user is equivalent to removing user
+     * information.
+     *
+     * @param string      $user     The user name to use for authority.
+     * @param null|string $password The password associated with $user.
+     *
+     * @return self A new instance with the specified user information.
+     */
+    public function withUserInfo($user, $password = null)
+    {
+        // TODO Validate input
+        $result = new IRI($this);
+        $result->userinfo = $user;
+        if ($password) {
+            $result->userinfo .= ':' . $password;
+        }
+
+        return $result;
+    }
+
+    /**
+     * Return an instance with the specified host.
+     *
+     * An empty host value is equivalent to removing the host.
+     *
+     * @param string $host The hostname to use with the new instance.
+     *
+     * @return self A new instance with the specified host.
+     *
+     * @throws \InvalidArgumentException for invalid hostnames.
+     */
+    public function withHost($host)
+    {
+        // TODO Validate input
+        $result = new IRI($this);
+        $result->host = $host;
+
+        return $result;
+    }
+
+    /**
+     * Return an instance with the specified port.
+     *
+     * A null value provided for the port is equivalent to removing the port
+     * information.
+     *
+     * @param null|int $port The port to use with the new instance; a null value
+     *                       removes the port information.
+     *
+     * @return self A new instance with the specified port.
+     *
+     * @throws \InvalidArgumentException for invalid ports.
+     */
+    public function withPort($port)
+    {
+        // TODO Validate input
+        // Implementations MUST raise an exception for ports outside the
+        // established TCP and UDP port ranges.
+        $result = new IRI($this);
+        $result->port = (string) $port;
+
+        return $result;
+    }
+
+    /**
+     * Return an instance with the specified path.
+     *
+     * The path can either be empty or absolute (starting with a slash) or
+     * rootless (not starting with a slash). Implementations MUST support all
+     * three syntaxes.
+     *
+     * If the path is intended to be domain-relative rather than path relative then
+     * it must begin with a slash ("/"). Paths not starting with a slash ("/")
+     * are assumed to be relative to some base path known to the application or
+     * consumer.
+     *
+     * Users can provide both encoded and decoded path characters.
+     *
+     * @param string $path The path to use with the new instance.
+     *
+     * @return self A new instance with the specified path.
+     *
+     * @throws \InvalidArgumentException for invalid paths.
+     */
+    public function withPath($path)
+    {
+        // TODO Validate input
+        // Implementations ensure the correct encoding as outlined in getPath()
+        $result = new IRI($this);
+        $result->path = $path;
+
+        return $result;
+    }
+
+    /**
+     * Return an instance with the specified query string.
+     *
+     * Users can provide both encoded and decoded query characters.
+     *
+     * An empty query string value is equivalent to removing the query string.
+     *
+     * @param string $query The query string to use with the new instance.
+     * @return self A new instance with the specified query string.
+     * @throws \InvalidArgumentException for invalid query strings.
+     */
+    public function withQuery($query)
+    {
+        // TODO Validate input
+        // Implementations ensure the correct encoding as outlined in getQuery()
+        $result = new IRI($this);
+        $result->query = $query;
+
+        return $result;
+    }
+
+    /**
+     * Return an instance with the specified URI fragment.
+     *
+     * Users can provide both encoded and decoded fragment characters.
+     *
+     * An empty fragment value is equivalent to removing the fragment.
+     *
+     * @param string $fragment The fragment to use with the new instance.
+     * @return self A new instance with the specified fragment.
+     */
+    public function withFragment($fragment)
+    {
+        // TODO Validate input
+        // Implementations ensure the correct encoding as outlined in getFragment()
+        $result = new IRI($this);
+        $result->fragment = $fragment;
+
+        return $result;
     }
 
     /**
