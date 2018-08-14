@@ -10,13 +10,14 @@
 namespace ML\IRI\Test;
 
 use ML\IRI\IRI;
+use PHPUnit\Framework\TestCase;
 
 /**
  * The IRI test suite.
  *
  * @author Markus Lanthaler <mail@markus-lanthaler.com>
  */
-class IriTest extends \PHPUnit_Framework_TestCase
+class IriTest extends TestCase
 {
     /**
      * Test parsing
