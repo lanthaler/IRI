@@ -18,7 +18,6 @@ install:
   - composer install
 
 before_script:
-  - vendor/bin/http_test_server > /dev/null 2>&1 &
   - if [[ "$COVERAGE" = true ]]; then PHPUNIT_FLAGS="--coverage-clover build/coverage.xml"; else PHPUNIT_FLAGS=""; fi
 
 script:

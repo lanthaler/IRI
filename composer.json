@@ -21,9 +21,8 @@
         "phpunit/phpunit": "4.8.*"
     },
     "autoload": {
-        "classmap": ["src/"],
         "psr-4": {
-            "ML\\IRI\\": "src/",
+            "ML\\IRI\\": "",
             "ML\\IRI\\Test\\": "Test/"
         }
     },
