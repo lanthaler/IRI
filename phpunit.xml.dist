@@ -17,7 +17,7 @@
 
     <filter>
         <whitelist processUncoveredFilesFromWhitelist="true">
-            <directory>src</directory>
+            <file>IRI.php</file>
         </whitelist>
     </filter>
 
