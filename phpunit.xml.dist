@@ -7,8 +7,7 @@
          convertWarningsToExceptions="true"
          processIsolation="false"
          stopOnFailure="false"
-         strict="true"
-         bootstrap="./Test/bootstrap.php">
+         bootstrap="vendor/autoload.php">
 
     <testsuites>
         <testsuite name="IRI Test Suite">
@@ -18,10 +17,7 @@
 
     <filter>
         <whitelist processUncoveredFilesFromWhitelist="true">
-            <directory>./</directory>
-            <exclude>
-                <directory>./Test</directory>
-            </exclude>
+            <file>IRI.php</file>
         </whitelist>
     </filter>
 
