@@ -22,9 +22,7 @@
     },
     "autoload": {
         "psr-4": {
-            "ML\\IRI\\": "",
-            "ML\\IRI\\Test\\": "Test/"
+            "ML\\IRI\\": ""
         }
-    },
-    "target-dir": "ML/IRI"
+    }
 }
